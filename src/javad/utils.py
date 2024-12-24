@@ -20,10 +20,15 @@ def load_asset(package: str, asset_name: str) -> bytes:
     Returns:
         Binary content of the asset file
     """
+    if package is None or asset_name is None:
+        raise ValueError("Both package and asset_name must be non-None")
+
     if sys.version_info >= (3, 9):
         # Modern approach using files() API
         import importlib.resources
 
+        print(f"Loading asset: {asset_name} from package: {package}")
+        print(f"Package: {importlib.resources.files(package)} vs {asset_name}")
         with importlib.resources.files(package).joinpath(asset_name).open("rb") as f:
             return f.read()
     elif sys.version_info >= (3, 7):

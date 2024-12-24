@@ -81,14 +81,16 @@ class Pipeline:
             + self.config.padding_size * modelinfo["hop_length"]
         )
 
-        self.__device = device
+        self.__device = (
+            device if isinstance(device, torch.device) else torch.device(device)
+        )
         self.audio_buffer = torch.zeros(
             self.config.buffer_size, dtype=torch.float32
         ).to(device)
-        self.__model = from_pretrained(name=model_name).to(device)
+        self.__model = from_pretrained(name=model_name).to(self.__device)
         self.__model.eval()
         # Preload mel filters
-        self.mel_filters = load_mel_filters(n_mels=self.config.n_mels).to(device)
+        self.preload_mel_filters(n_mels=self.config.n_mels)
 
         self.mean = 0.0
         self.variance = 0.0
@@ -125,6 +127,15 @@ class Pipeline:
     def to(self, device: Union[torch.device, str]) -> "Pipeline":
         self.device = device
         return self
+
+    def preload_mel_filters(self, n_mels: int) -> torch.Tensor:
+        """Load mel filter bank matrices for a given number of mel bins."""
+        if self.__device == torch.device("mps"):
+            self.mel_filters = (
+                load_mel_filters(n_mels=n_mels).to(torch.float32).to(self.__device)
+            )
+        else:
+            self.mel_filters = load_mel_filters(n_mels=n_mels).to(self.__device)
 
     def update_stats(self, spectrogram: torch.Tensor):
         """
