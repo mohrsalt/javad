@@ -1,0 +1,11 @@
+.vscode
+__pycache__
+*.pyc
+dist
+egg-info
+.env
+.pytest_cache
+javad.egg-info
+/utils
+*_raw.pt
+/docs/build

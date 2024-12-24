@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "javad"
+version = "0.1.0"
+description = "JaVAD: Just Another Voice Activity Detector"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [
+    { name = "Sergey Skrebnev", email = "sergey.skrebnev@gmail.com" }
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+]
+dependencies = [
+    "torch>=2.0.0",
+    "numpy>=1.20.0",
+]
+
+[project.optional-dependencies]
+extras = [
+    "soundfile>=0.12.0"
+]
+test = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+]
+
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+packages = [
+    "javad",
+    # "javad.extras" is excluded from default installation
+]
+extras-packages = [
+    "javad.extras"  # Include only when extras are specified
+]
+[tool.setuptools.package-data]
+"javad.assets" = ["*.pt", "mel_filters.npz"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+addopts = "-v"
