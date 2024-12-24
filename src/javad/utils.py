@@ -1,6 +1,5 @@
 import numpy as np
 import torch
-import pickle
 from io import BytesIO
 import sys
 from typing import Union
@@ -52,7 +51,7 @@ def load_checkpoint(name: str):
     """Load a PyTorch checkpoint from the assets directory."""
     checkpoint_data = load_asset("javad.assets", f"{name}.pt")
     buffer = BytesIO(checkpoint_data)  # Create an in-memory binary stream
-    return pickle.load(buffer)
+    return torch.load(buffer, weights_only=True)
 
 
 def load_mel_filters(n_mels: int) -> torch.Tensor:
