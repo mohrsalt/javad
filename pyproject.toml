@@ -25,7 +25,7 @@ dependencies = [
 
 [project.urls]
 "Homepage" = "https://github.com/skrbnv/javad"
-"Documentation" = "https://github.com/skrbnv/javad"
+"Documentation" = "https://javad.readthedocs.io/en/latest/"
 
 [project.optional-dependencies]
 extras = [
