@@ -27,8 +27,6 @@ def load_asset(package: str, asset_name: str) -> bytes:
         # Modern approach using files() API
         import importlib.resources
 
-        print(f"Loading asset: {asset_name} from package: {package}")
-        print(f"Package: {importlib.resources.files(package)} vs {asset_name}")
         with importlib.resources.files(package).joinpath(asset_name).open("rb") as f:
             return f.read()
     elif sys.version_info >= (3, 7):

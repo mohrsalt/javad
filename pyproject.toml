@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "javad"
-version = "0.1.0"
+version = "0.1.1"
 description = "JaVAD: Just Another Voice Activity Detector"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -42,7 +42,6 @@ package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
-exclude = ["javad.extras"]  # Exclude "extras" from default installations
 
 [tool.setuptools.package-data]
 "javad.assets" = ["*.pt", "mel_filters.npz"]
