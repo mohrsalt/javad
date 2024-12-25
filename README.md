@@ -14,16 +14,16 @@ There are three models:
 - For evaluation, Google's AVA Speech dataset was used, or, to be accurate, only clips that are still available (74 in total). Since AVA Speech has only 15 minutes from each clip labeled, 18.5 hours of audio in total were used.  
 - For evaluation purposes, JaVAD was trained on a custom, manually labelled dataset using a separate, different collection of YouTube clips. Production models were trained on all available data.
 
-| Model                  | Precision | Recall | F1 Score   | AUROC  | Time, GPU<br>Nvidia 3090 | Time, CPU<br>Ryzen 3900XT |
-|------------------------|-----------|--------|------------|--------|------------|------------|
-| Nvidia NEMO            | 0.7676    | 0.9526 | 0.8502     | 0.9201 | 26.24s     | <span style="color:lightgreen">56.94s</span>     |
-| WebRTC (via py-webrtc) | 0.6099    | 0.9454 | 0.7415     | -¹     | -²         | 59.85s     |
-| Google Speechbrain     | 0.8213    | 0.8534 | 0.8370     | 0.8961 | 1371.00s   | 1981.40s   |
-| Pyannote               | 0.9173    | 0.8463 | 0.8804     | 0.9495 | 75.49s     | 823.19s    |
-| Silero                 | 0.9678    | 0.6503 | 0.9050     | 0.9169 | 830.27s³   | 695.58s    |
-| JaVAD tiny⁴*           | 0.9263    | 0.8846 | 0.8961     | 0.9550 | 22.32s     | 476.93s    |
-| JaVAD balanced*        | 0.9284    | 0.8938 | 0.9108     | 0.9642 | <span style="color:lightgreen">16.38s</span>     | 220.00s    |
-| JaVAD precise*         | 0.9359    | 0.8980 | <span style="color:lightgreen">0.9166</span> | <span style="color:lightgreen">0.9696</span> | 18.58s     | 236.61s    |
+| Model                  | Precision | Recall | F1 Score   | AUROC      | Time, GPU<br>Nvidia 3090 | Time, CPU<br>Ryzen 3900XT |
+|------------------------|-----------|--------|------------|------------|------------|------------|
+| Nvidia NEMO            | 0.7676    | 0.9526 | 0.8502     | 0.9201     | 26.24s     | **56.94s** |
+| WebRTC (via py-webrtc) | 0.6099    | 0.9454 | 0.7415     | -¹         | -²         | 59.85s     |
+| Google Speechbrain     | 0.8213    | 0.8534 | 0.8370     | 0.8961     | 1371.00s   | 1981.40s   |
+| Pyannote               | 0.9173    | 0.8463 | 0.8804     | 0.9495     | 75.49s     | 823.19s    |
+| Silero                 | 0.9678    | 0.6503 | 0.9050     | 0.9169     | 830.27s³   | 695.58s    |
+| JaVAD tiny⁴*           | 0.9263    | 0.8846 | 0.8961     | 0.9550     | 22.32s     | 476.93s    |
+| JaVAD balanced*        | 0.9284    | 0.8938 |   0.9108   | 0.9642     | **16.38s** | 220.00s    |
+| JaVAD precise*         | 0.9359    | 0.8980 | **0.9166** | **0.9696** | 18.58s     | 236.61s    |
 
 
 ¹ *WebRTC does not return logits* ² *WebRTC via py-webrtc can be run only on CPU*  
@@ -89,10 +89,10 @@ print(processor)
 
 # Process audio
 # Get logits
-logits = processor.logits(audio).cpy().numpy() 
+logits = processor.logits(audio).cpu().numpy() 
 print(logits)
 # Get boolean predictions based on threshold
-predictions = processor.predict(audio).cpy().numpy() 
+predictions = processor.predict(audio).cpu().numpy() 
 print(predictions)
 # Get speech intervals
 intervals = processor.intervals(audio) 
@@ -101,16 +101,15 @@ print(intervals)
 You can increase accuracy by specifying the step size for the sliding window. The smaller the step, the longer it takes to compute and average predictions, resulting in a more accurate outcome.
 
 
-### Stream Processing, stream/MPS[if available]:
-
+### Stream Processing, stream/CUDA[if available]:
 ```python
 import torch
 from javad.stream import Pipeline
 from javad.extras import load_audio
 
 # Initialize pipeline
-pipeline = Pipeline()  # by default, Pipeline uses 'tiny' model
-pipeline.to(torch.device("mps" if torch.mps.is_available() else "cpu"))
+pipeline = Pipeline()  # by default, Pipeline uses 'balanced' model
+pipeline.to(torch.device("cuda" if torch.cuda.is_available() else "cpu"))
 print(pipeline)
 
 # Load audio file
@@ -137,7 +136,7 @@ from javad.extras import load_audio
 
 # Initialize pipeline
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-pipeline = Pipeline(device=device) # by default, Pipeline uses 'tiny' model
+pipeline = Pipeline(device=device) # by default, Pipeline uses 'balanced' model
 
 # Generate chunk of audio
 audio = load_audio("path/to/audio.wav")
