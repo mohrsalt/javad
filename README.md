@@ -45,10 +45,18 @@ There are three models:
 
 ### Install via pip
 
+If you already have audio loaded and just want to process it with minimum dependencies:
 ```bash
-pip install javad  # or
-pip install javad[extras]  # with audio loading
+pip install javad 
 ```
+
+If you want to load audio:
+```bash
+pip install javad[extras]  # with audio loading 
+# if you're using zsh, add quotes
+pip install 'javad[extras]'
+```
+
 
 ## Usage
 
