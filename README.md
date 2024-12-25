@@ -57,6 +57,10 @@ pip install javad[extras]  # with audio loading
 pip install 'javad[extras]'
 ```
 
+## Documentation
+
+https://javad.readthedocs.io/en/latest/
+
 
 ## Usage
 
