@@ -12,7 +12,7 @@ There are three models:
 ## Comparison
 
 - For evaluation, Google's AVA Speech dataset was used, or, to be accurate, only clips that are still available (74 in total). Since AVA Speech has only 15 minutes from each clip labeled, 18.5 hours of audio in total were used.  
-- For evaluation purposes, JaVAD was trained on a custom, manually labelled dataset using a separate, different collection of YouTube clips. Production models were trained on all available data.
+- For evaluation purposes, JaVAD was trained on a custom, manually labelled dataset using a separate, different collection of YouTube clips. 
 
 | Model                  | Precision | Recall | F1 Score   | AUROC      | Time, GPU<br>Nvidia 3090 | Time, CPU<br>Ryzen 3900XT |
 |------------------------|-----------|--------|------------|------------|------------|------------|
@@ -150,6 +150,72 @@ print(bool_prediction)
 # Reset Pipeline for new stream
 pipeline.reset()
 ```
+
+### Training/Fine-tuning
+To re-train/fine-tune the model, Trainer class is complete solution.
+You will also need to prepare your dataset (see below).
+```python
+import torch
+import logging
+from javad.extras import Trainer
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    trainer = Trainer(
+        run_name="balanced_test",
+        dataset_settings={
+            "audio_root": "path-to-dir-with-audio",
+            "spectrograms_root": "path-to-dir-to-save-generated-spectrograms-aka-cache",
+            "index_root": "path-to-dir-to-save-index-files-of-the-dataset",
+            "metadata_json_path": "path-to-metadata-json-file",
+            "max_memory_cache": 16000, # allow to use up to 16Gb of RAM to retain spectrograms 
+        },
+        use_mixed_precision=True,
+        use_scheduler=True,
+        window_min_content_ratio=0.5,
+        window_offset_sec=0.5,
+        device=torch.device("cuda:0"),
+        learning_rate=1e-4,
+        num_workers=2,
+        total_epochs=20,
+        augmentations={
+            "mix_chance": 0.0,
+            "erase_chance": 0.0,
+            "zero_chance": 0.00,
+        },
+    )
+    trainer.train()
+```
+#### Example of metadata.json
+```json
+{
+    "farsi/01.flac": {
+        "length": 14393728,
+        "intervals": {
+            "speech": [
+                [22347, 165856],
+                [178426, 247214],
+            ]
+        },
+        "metadata": {
+        }
+    }
+}
+```
+```
+It's a dictionary of data for all audio files in dataset `{relative_to_audio_root_path: data}`, where data is a dict with following fields: 
+
+{
+    'length': len of audio file in samples,
+    'intervals': { dictionary of different intervals, just "speech" in out case
+        "speech": list of list of speech intervals in samples
+    },
+    'metadata': {
+        dict of extra data for SpectrogramDataset class to extract data from, like gender or language. Not applicable in our case.
+    }
+}
+```
+
 
 ## License
 

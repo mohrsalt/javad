@@ -20,9 +20,21 @@ class TestProcessor:
         assert processor.device == torch.device("cpu")
 
     @pytest.mark.parametrize("model_name", ["tiny", "balanced", "precise"])
-    def test_init_custom_model(self, model_name, sample_audio):
+    def test_init_default_model(self, model_name, sample_audio):
         processor = Processor(model_name=model_name)
-        print(type(sample_audio), sample_audio)
+        # should not raise error
+        _ = processor.intervals(sample_audio)
+
+    @pytest.mark.parametrize(
+        "checkpoint",
+        [
+            "src/javad/assets/balanced.pt",
+            "src/javad/assets/tiny.pt",
+            "src/javad/assets/precise.pt",
+        ],
+    )
+    def test_init_custom_checkpoint(self, checkpoint, sample_audio):
+        processor = Processor(checkpoint=checkpoint)
         # should not raise error
         _ = processor.intervals(sample_audio)
 

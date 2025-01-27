@@ -319,19 +319,27 @@ def initialize(name: str = "balanced") -> torch.nn.Module:
     return mdl
 
 
-def from_pretrained(name: str = "balanced") -> torch.nn.Module:
+def from_pretrained(
+    name: str = "balanced", checkpoint: Union[str, None] = None
+) -> torch.nn.Module:
     """
     Initializes and loads a pre-trained model.
 
     Args:
         name (str): The name of the model to initialize and load. Defaults to "balanced".
             Available options are "tiny" and "precise"
+        checkpoint (str, optional): The path to a checkpoint file to load. Defaults to None.
+            If not None, the model will be loaded from the checkpoint file.
 
     Returns:
         torch.nn.Module: The initialized and loaded model.
     """
-
-    mdl = initialize(name=name)
-    checkpoint = load_checkpoint(name)
-    mdl.load_state_dict(checkpoint)
+    if checkpoint is not None:
+        cpt = load_checkpoint(checkpoint, is_asset=False)
+    else:
+        cpt = load_checkpoint(name)
+    model_name = cpt["model_name"]
+    state_dict = cpt["state_dict"]
+    mdl = initialize(name=model_name)
+    mdl.load_state_dict(state_dict=state_dict)
     return mdl

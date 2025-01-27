@@ -2,7 +2,7 @@ import numpy as np
 import torch
 from io import BytesIO
 import sys
-from typing import Union
+from typing import Union, Any
 
 
 def exact_div(x, y):
@@ -50,11 +50,24 @@ def _load_mel_filters():
     return np.load(buffer, allow_pickle=False)
 
 
-def load_checkpoint(name: str):
-    """Load a PyTorch checkpoint from the assets directory."""
-    checkpoint_data = load_asset("javad.assets", f"{name}.pt")
-    buffer = BytesIO(checkpoint_data)  # Create an in-memory binary stream
-    return torch.load(buffer, weights_only=True)
+def load_checkpoint(name: str, is_asset: bool = True) -> Any:
+    """Load a PyTorch checkpoint from the assets directory or locally."""
+    if is_asset is True:
+        checkpoint_data = load_asset("javad.assets", f"{name}.pt")
+        buffer = BytesIO(checkpoint_data)  # Create an in-memory binary stream
+        return torch.load(buffer, weights_only=True)
+    else:
+        with open(name, "rb") as f:
+            return torch.load(f, weights_only=True)
+
+
+def convert_checkpoint_to_model_weights(
+    checkpoint_path: str, save_path: Union[str, None] = None
+) -> None:
+    checkpoint = load_checkpoint(checkpoint_path, is_asset=False)
+    if save_path is None:
+        save_path = checkpoint_path.split(".")[0] + "_weights.pt"
+    torch.save(checkpoint["state_dict"], save_path)
 
 
 def load_mel_filters(n_mels: int) -> torch.Tensor:

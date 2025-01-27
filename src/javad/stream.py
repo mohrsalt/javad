@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from javad.main import from_pretrained, MODELINFO
+from javad.main import from_pretrained, MODELINFO, load_checkpoint
 from javad.utils import exact_div
 from javad.utils import load_mel_filters, log_mel_spectrogram
 from types import SimpleNamespace
@@ -12,6 +12,7 @@ class Pipeline:
     def __init__(
         self,
         model_name: str = "balanced",
+        checkpoint: Union[str, None] = None,
         mode: str = "gradual",
         threshold: Union[float, None] = None,
         device: Union[torch.device, str] = torch.device("cpu"),
@@ -22,6 +23,7 @@ class Pipeline:
 
         Args:
             model_name (str, optional): Name of the model to use. Defaults to "balanced" (there are also "tiny" and "precise" options).
+            checkpoint (Union[str, None], optional): Path to a custom model checkpoint. If None, uses the default model.
             mode (str, optional): Processing mode - "instant" or "gradual". Defaults to "gradual".
                 'instant' mode immediately returns latest predictions, although it may not be as accurate
                 as 'gradual' mode which maintains and updates predictions while chunks are moving across buffer.
@@ -57,6 +59,18 @@ class Pipeline:
             predicted_intervals (dict): Storage for predicted intervals
             detection_carry (int): Carryover detection counter
         """
+        self.__device = (
+            device if isinstance(device, torch.device) else torch.device(device)
+        )
+        # Initialize model
+        if checkpoint is not None:
+            cpt = load_checkpoint(checkpoint, is_asset=False)
+            model_name = cpt["model_name"]
+            self.__model = from_pretrained(checkpoint=checkpoint).to(self.__device)
+        else:
+            self.__model = from_pretrained(name=model_name).to(self.__device)
+        self.__model.eval()
+
         self.mode = mode
         modelinfo = MODELINFO[model_name]
         fps = int(exact_div(modelinfo["sample_rate"], modelinfo["hop_length"]))
@@ -81,14 +95,10 @@ class Pipeline:
             + self.config.padding_size * modelinfo["hop_length"]
         )
 
-        self.__device = (
-            device if isinstance(device, torch.device) else torch.device(device)
-        )
         self.audio_buffer = torch.zeros(
             self.config.buffer_size, dtype=torch.float32
         ).to(device)
-        self.__model = from_pretrained(name=model_name).to(self.__device)
-        self.__model.eval()
+
         # Preload mel filters
         self.preload_mel_filters(n_mels=self.config.n_mels)
 

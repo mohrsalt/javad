@@ -54,6 +54,19 @@ class TestPipeline:
         chunk = sample_audio[:1600]
         _ = pipeline.push(chunk)  # Should not raise error
 
+    @pytest.mark.parametrize(
+        "checkpoint",
+        [
+            "src/javad/assets/balanced.pt",
+            "src/javad/assets/tiny.pt",
+            "src/javad/assets/precise.pt",
+        ],
+    )
+    def test_init_custom_checkpoint(self, checkpoint, sample_audio):
+        pipeline = Pipeline(checkpoint=checkpoint)
+        chunk = sample_audio[:1600]
+        _ = pipeline.push(chunk)  # Should not raise error
+
     @pytest.mark.parametrize("device", ["cpu", "cuda", "mps"])
     def test_device(self, device, sample_audio):
         if device == "cuda" and not torch.cuda.is_available():
@@ -69,7 +82,6 @@ class TestPipeline:
         pipeline = Pipeline(mode=mode)
         chunk = sample_audio[:1600]
         results = pipeline.predict(chunk)
-        print(type(results))
         if mode == "instant":
             predictions = results
         else:

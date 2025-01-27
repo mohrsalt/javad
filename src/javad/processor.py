@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from javad.main import from_pretrained, MODELINFO
+from javad.main import initialize, from_pretrained, MODELINFO, load_checkpoint
 from javad.utils import exact_div, load_mel_filters, log_mel_spectrogram
 import warnings
 from typing import List, Tuple, Union
@@ -12,6 +12,7 @@ class Processor:
     def __init__(
         self,
         model_name: str = "balanced",
+        checkpoint: Union[str, None] = None,
         step: Union[float, None] = None,
         onset: float = 0.0,
         offset: float = 0.0,
@@ -28,6 +29,7 @@ class Processor:
 
         Args:
             model_name (str, optional): Name of the model to use. Defaults to "balanced". Available values are: "tiny" and "precise"
+            checkpoint (Union[str, None], optional): Path to a custom model checkpoint. If None, uses the default model. Defaults to None.
             step (Union[float, None], optional): Step size for sliding windows. If None, uses model input length (windows do not overlap). Defaults to None.
             onset (float, optional): Onset threshold for speech detection. Defaults to 0.0.
             offset (float, optional): Offset threshold for speech detection. Defaults to 0.0.
@@ -42,6 +44,19 @@ class Processor:
         Returns:
             None
         """
+
+        self.__device = (
+            device if isinstance(device, torch.device) else torch.device(device)
+        )
+        # Initialize model
+        if checkpoint is not None:
+            cpt = load_checkpoint(checkpoint, is_asset=False)
+            model_name = cpt["model_name"]
+            self.__model = from_pretrained(checkpoint=checkpoint).to(self.__device)
+        else:
+            self.__model = from_pretrained(name=model_name).to(self.__device)
+        self.__model.eval()
+
         modelinfo = MODELINFO[model_name]
         fps = int(exact_div(modelinfo["sample_rate"], modelinfo["hop_length"]))
         # with sample rate = 16000, hop length = 160 -> fps = 100
@@ -66,12 +81,6 @@ class Processor:
         assert (
             self.config.step <= modelinfo["input_length"]
         ), f"Step size {self.config.step}s cannot exceed model input length {modelinfo['input_length']}s"
-        self.__device = (
-            device if isinstance(device, torch.device) else torch.device(device)
-        )
-        # Initialize model
-        self.__model = from_pretrained(name=model_name).to(self.__device)
-        self.__model.eval()
         # Preload mel filters
         self.preload_mel_filters(n_mels=self.config.n_mels)
 

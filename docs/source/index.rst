@@ -27,7 +27,11 @@ Requirements
 - Python 3.8+
 - PyTorch 2.0.0+
 - NumPy 1.20.0+
-- Optional: `soundfile` for additional audio processing features
+- Optional, if using with [extras] (sound loading, Trainer): 
+    - soundfile 0.12.0+,
+    - torchvision 0.10.0+,
+    - spgdataset 0.0.2+,
+    - tqdm
 
 .. toctree::
    :maxdepth: 2
