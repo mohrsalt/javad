@@ -1,8 +1,8 @@
 import numpy as np
 import torch
-from javad.main import from_pretrained, MODELINFO, load_checkpoint
-from javad.utils import exact_div
-from javad.utils import load_mel_filters, log_mel_spectrogram
+from javad.src.javad.main import from_pretrained, MODELINFO, load_checkpoint
+from javad.src.javad.utils import exact_div
+from javad.src.javad.utils import load_mel_filters, log_mel_spectrogram
 from types import SimpleNamespace
 from typing import List, Tuple, Dict, Union
 import warnings

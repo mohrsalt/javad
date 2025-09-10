@@ -45,7 +45,7 @@ def load_asset(package: str, asset_name: str) -> bytes:
 
 def _load_mel_filters():
     """Load an NPZ file from the assets directory."""
-    npz_data = load_asset("javad.assets", "mel_filters.npz")
+    npz_data = load_asset("javad.src.javad.assets", "mel_filters.npz")
     buffer = BytesIO(npz_data)  # Create an in-memory binary stream
     return np.load(buffer, allow_pickle=False)
 
@@ -53,7 +53,7 @@ def _load_mel_filters():
 def load_checkpoint(name: str, is_asset: bool = True) -> Any:
     """Load a PyTorch checkpoint from the assets directory or locally."""
     if is_asset is True:
-        checkpoint_data = load_asset("javad.assets", f"{name}.pt")
+        checkpoint_data = load_asset("javad.src.javad.assets", f"{name}.pt")
         buffer = BytesIO(checkpoint_data)  # Create an in-memory binary stream
         return torch.load(buffer, weights_only=True)
     else:

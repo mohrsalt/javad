@@ -3,7 +3,7 @@ import torch.nn as nn
 import numpy as np
 from typing import Optional, Union
 from torch import Tensor
-from javad.utils import load_checkpoint
+from javad.src.javad.utils import load_checkpoint
 
 
 MODELINFO = {

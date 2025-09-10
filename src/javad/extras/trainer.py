@@ -10,7 +10,7 @@ from types import SimpleNamespace
 import os
 import random
 import logging
-from javad import MODELINFO, from_pretrained, load_checkpoint
+from javad.src.javad import MODELINFO, from_pretrained, load_checkpoint
 from typing import Union
 
 ##################################################

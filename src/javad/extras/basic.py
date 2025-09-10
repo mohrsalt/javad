@@ -1,6 +1,6 @@
 import torch
-from javad import Processor
-from javad.extras import load_audio
+from javad.src.javad.processor import Processor
+from javad.src.javad.extras.audio import load_audio
 from typing import List, Tuple, Union
 
 

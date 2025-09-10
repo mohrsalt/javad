@@ -1,7 +1,7 @@
 import numpy as np
 import torch
-from javad.main import initialize, from_pretrained, MODELINFO, load_checkpoint
-from javad.utils import exact_div, load_mel_filters, log_mel_spectrogram
+from javad.src.javad.main import initialize, from_pretrained, MODELINFO, load_checkpoint
+from javad.src.javad.utils import exact_div, load_mel_filters, log_mel_spectrogram
 import warnings
 from typing import List, Tuple, Union
 from torch.utils.data import TensorDataset, DataLoader
