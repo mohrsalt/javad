@@ -2,7 +2,7 @@ import torch
 from soundfile import read as sf_read_audio
 from subprocess import CalledProcessError, run
 import warnings
-
+import librosa
 
 def load_audio(filename: str, sr: int = 16000, mono: bool = True) -> torch.Tensor:
     """Load audio file with automatic fallback between ffmpeg and soundfile.
@@ -35,6 +35,9 @@ def load_audio(filename: str, sr: int = 16000, mono: bool = True) -> torch.Tenso
         try:
             # Fallback to soundfile
             data = sf_read_audio(filename, sr, dtype="float32").to(torch.float32)
+            waveform_16k, _ = librosa.load(filename, sr=16000, mono=True)
+            print("Javad shape: ",data.shape)
+            print("Waveform_16k shape: ",waveform_16k.shape)
         except Exception as sf_error:
             raise IOError(
                 f"Failed to load audio file {filename} with both ffmpeg and soundfile. "
