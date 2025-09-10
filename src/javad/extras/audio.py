@@ -54,7 +54,7 @@ def load_audio(filename: str, sr: int = 16000, mono: bool = True) -> torch.Tenso
     print("Waveform_converted type: ",type(waveform2))  
     print("Ret data shape: ",data.shape)
     print("Ret data type: ",type(data))
-    return data
+    return waveform2
 
 
 def load_audio_ffmpeg(file: str, sr: int = 16000) -> torch.Tensor:
