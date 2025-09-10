@@ -48,7 +48,9 @@ def load_audio(filename: str, sr: int = 16000, mono: bool = True) -> torch.Tenso
         data = data.mean(axis=1)
     waveform_16k, _ = librosa.load(filename, sr=16000, mono=True)
     print("Waveform_16k shape: ",waveform_16k.shape)
+    print("Waveform_16k type: ",type(waveform_16k))
     print("Ret data shape: ",data.shape)
+    print("Ret data type: ",type(data))
     return data
 
 
