@@ -21,10 +21,10 @@ MODELINFO = {
         "input_length": 0.64,
         "output_length": 64,
         # audio params
-        "sample_rate": 16000,
-        "n_mels": 64,
-        "hop_length": 160,
-        "n_fft": 400,
+        "sample_rate": 32000,
+        "n_mels": 128,
+        "hop_length": 320,
+        "n_fft": 800,
     },
     "balanced": {
         "args": {},
@@ -32,10 +32,10 @@ MODELINFO = {
         "input_length": 1.92,
         "output_length": 192,
         # audio params
-        "sample_rate": 16000,
-        "n_mels": 80,
-        "hop_length": 160,
-        "n_fft": 400,
+        "sample_rate": 32000,
+        "n_mels": 128,
+        "hop_length": 320,
+        "n_fft": 800,
     },
     "precise": {
         "args": {
@@ -52,10 +52,10 @@ MODELINFO = {
         "input_length": 3.84,
         "output_length": 384,
         # audio params
-        "sample_rate": 16000,
-        "n_mels": 80,
-        "hop_length": 160,
-        "n_fft": 400,
+        "sample_rate": 32000,
+        "n_mels": 128,
+        "hop_length": 320,
+        "n_fft": 800,
     },
 }
 

@@ -94,9 +94,9 @@ def load_mel_filters(n_mels: int) -> torch.Tensor:
 
 def log_mel_spectrogram(
     audio: Union[np.ndarray, torch.Tensor],
-    n_mels: int = 80,
-    n_fft: int = 400,
-    hop_length: int = 160,
+    n_mels: int = 128,
+    n_fft: int = 800,
+    hop_length: int = 320,
     mel_filters: Union[torch.Tensor, None] = None,
     device: torch.device = torch.device("cpu"),
     dtype: torch.dtype = torch.float32,
