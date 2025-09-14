@@ -10,7 +10,7 @@ from types import SimpleNamespace
 import os
 import random
 import logging
-from javad.src.javad import MODELINFO, from_pretrained, load_checkpoint
+from javad.src.javad import MODELINFO, from_pretrained, load_checkpoint,initialize
 from typing import Union
 
 ##################################################
@@ -328,7 +328,8 @@ class Trainer(torch.nn.Module):
             logging.info(f"Resuming training using checkpoint {checkpoint}")
             cpt = load_checkpoint(checkpoint, is_asset=False)
             self.model_name = cpt['model_name']
-        self.model = from_pretrained(self.model_name).float().to(device)
+        #self.model = from_pretrained(self.model_name).float().to(device)
+        self.model = initialize(self.model_name).float().to(device)
         self.optimizer = Adam(self.model.parameters(), lr=learning_rate)
         self.scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
                 self.optimizer, T_max=total_epochs, eta_min=1e-7
