@@ -217,9 +217,9 @@ class JaVAD(nn.Module):
         seq: dict = {
             "conv1": ["crb", 1, 128, (3, 7), (1, 3), (1, 3)],
             "conv2": None,
-            "conv3": ["dc", 128, 256, 3, 1, 1, (40, 32)],
+            "conv3": ["dc", 128, 256, 3, 1, 1, (64, 32)],
         },
-        n_state: int = 320,
+        n_state: int = 512,
         n_head: int = 4,
         n_layer: int = 0,
         output_dim: int = 192,
