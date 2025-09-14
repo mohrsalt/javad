@@ -4,7 +4,7 @@ from torchvision.transforms import v2
 from torch.optim.adam import Adam
 from torch.utils.data import DataLoader
 from torch.amp.grad_scaler import GradScaler
-from spgdataset import SpectrogramDataset
+from spgdataset.src.spgdataset.dataset import SpectrogramDataset
 from tqdm import tqdm
 from types import SimpleNamespace
 import os
