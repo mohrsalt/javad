@@ -17,8 +17,8 @@ class Processor:
         onset: float = 0.0,
         offset: float = 0.0,
         padding: tuple = (0.0, 0.0),
-        min_duration: float = 0.3,
-        min_silence: float = 0.3,
+        min_duration: float = 0.0,
+        min_silence: float = 0.0,
         batch_size: int = 32,
         num_workers: int = 0,
         threshold: Union[float, None] = None,
@@ -223,7 +223,7 @@ class Processor:
         """Predict voice activity from audio signal. Converts logits (values) to boolean predictions."""
         logits = self.logits(audio=audio, step=step)
         predictions = logits > self.config.threshold  # Convert to boolean predictions
-        return predictions
+        return logits,predictions
 
     def intervals(
         self, audio: Union[np.ndarray, torch.Tensor], step: Union[float, None] = None
@@ -256,7 +256,7 @@ class Processor:
             - offset: End time to ignore
             - min_silence: Minimum silence duration between intervals
         """
-        predictions = self.predict(audio=audio, step=step)
+        logits,predictions = self.predict(audio=audio, step=step)
         intervals = self.predictions_to_intervals(predictions, self.config.fps)
 
         filtered_intervals = []
@@ -308,7 +308,10 @@ class Processor:
                 merged_intervals.append(current_interval)
             else:
                 merged_intervals = padded_intervals
-        return merged_intervals
+        
+        print(len(merged_intervals))
+        logits=logits.tolist()
+        return logits,merged_intervals
 
     def __repr__(self) -> str:
 
@@ -367,4 +370,55 @@ class Processor:
             start_time = float(start) / fps
             end_time = float(end) / fps
             intervals.append((start_time, end_time))
+        return intervals
+
+    @staticmethod
+    def predictions_to_intervals_logits(
+        bool_array: torch.Tensor,
+        fps: int,
+        logits,
+    ) -> Tuple[List[Tuple[float, float]], List[float]]:
+        """
+        Converts a boolean tensor array of predictions into a list of time intervals.
+        Optionally also returns the average logit per interval when `logits` is provided.
+
+        Args:
+            bool_array (torch.Tensor): 1D boolean tensor where True represents active segments.
+            fps (int): Frames per second, used to convert frame indices to seconds.
+            logits (Optional[torch.Tensor]): 1D tensor of per-frame logits (same length as bool_array).
+
+        Returns:
+            Tuple[
+                List[Tuple[float, float]],          # intervals [(start_s, end_s), ...]
+                Optional[List[float]]               # avg logits per interval (or None if logits is None)
+            ]
+        """
+        # Validate inputs when logits are provided
+        if logits is not None:
+            assert bool_array.shape[0] == logits.shape[0], "Length mismatch: bool_array vs logits"
+
+        # Indices where the boolean value changes
+        changes = torch.where(bool_array[:-1] != bool_array[1:])[0] + 1
+
+        # Add start and/or end boundaries when a segment begins at 0 or ends at the last index
+        if bool_array[0]:
+            changes = torch.cat([torch.tensor([0], device=changes.device, dtype=changes.dtype), changes])
+        if bool_array[-1]:
+            changes = torch.cat([changes, torch.tensor([len(bool_array)], device=changes.device, dtype=changes.dtype)])
+
+        # Build intervals (and average logits if requested)
+        intervals: List[Tuple[float, float]] = []
+        
+
+        for start, end in zip(changes[::2], changes[1::2]):
+            start_i = int(start.item())
+            end_i   = int(end.item())
+
+            # Convert frame indices to seconds using fps
+            start_time = float(start_i) / fps
+            end_time   = float(end_i) / fps
+            intervals.append((start_time, end_time))
+
+
+
         return intervals

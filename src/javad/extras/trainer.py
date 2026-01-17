@@ -403,9 +403,11 @@ class Trainer(torch.nn.Module):
         for epoch in range(self.current_epoch, self.total_epochs):
             losses = []
 
-            for inputs, masks in (
+            for idr,(inputs, masks) in enumerate((
                 pbar := tqdm(self.dataloader, desc=f"Epoch {epoch:02d}/{self.total_epochs:02d}, training")
-            ):
+            )):
+                #if idr==:
+                #    break
                 inputs = inputs.to(self.device)
                 masks = masks.to(self.device)
                 self.optimizer.zero_grad()

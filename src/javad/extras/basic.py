@@ -6,6 +6,7 @@ from typing import List, Tuple, Union
 
 def get_speech_intervals(
     audio: str,
+checkpoint: str,
     model_name: str = "balanced",
     device: Union[torch.device, str] = torch.device("cpu"),
 ) -> List[Tuple[float, float]]:
@@ -27,6 +28,6 @@ def get_speech_intervals(
     """
     if isinstance(device, str):
         device = torch.device(device)
-    pipeline = Processor(model_name=model_name, device=device)
+    pipeline = Processor(model_name=model_name, checkpoint=checkpoint, device=device)
     data = load_audio(audio)
     return pipeline.intervals(data)

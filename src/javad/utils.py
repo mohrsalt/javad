@@ -58,6 +58,9 @@ def load_checkpoint(name: str, is_asset: bool = True) -> Any:
         return torch.load(buffer, weights_only=True)
     else:
         with open(name, "rb") as f:
+            print("loading fromm here", name)
+            if( not torch.cuda.is_available()):
+                return torch.load(f, weights_only=True, map_location=torch.device('cpu') )
             return torch.load(f, weights_only=True)
 
 
